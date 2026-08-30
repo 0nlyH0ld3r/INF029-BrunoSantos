@@ -37,34 +37,34 @@ int main() {
 		clean_buffer();
 
 		switch(opcao) {
-		case 0: 
-			sair = 1;
-			break;
-		case 1: 
-			switch(inserir(lista_celulares, tamanho)) {
-			case 0:
-				puts("Cadastro bem sucedido!\n");
+			case 0: 
+				sair = 1;
 				break;
-			case 1:
-				puts("Não há espaço para realizar o cadastro!\n");
+			case 1: 
+				switch(inserir(lista_celulares, tamanho)) {
+					case 0:
+						puts("Cadastro bem sucedido!\n");
+						break;
+					case 1:
+						puts("Não há espaço para realizar o cadastro!\n");
+						break;
+				}
 				break;
-			}
-			break;
-		case 2: 
-			listar(lista_celulares, tamanho);
-			break;
-		case 3: 
-			puts("Qual celular deseja atualizar: ");
-			scanf("%d", &x);
-			clean_buffer();
-			atualizar(&lista_celulares[x]);
-			break;
-		case 4: 
-			puts("Qual celular deseja deletar: ");
-			scanf("%d", &x);
-			clean_buffer();
-			deletar(&lista_celulares[x]);
-			break;
+			case 2: 
+				listar(lista_celulares, tamanho);
+				break;
+			case 3: 
+				puts("Qual celular deseja atualizar: ");
+				scanf("%d", &x);
+				clean_buffer();
+				atualizar(&lista_celulares[x]);
+				break;
+			case 4: 
+				puts("Qual celular deseja deletar: ");
+				scanf("%d", &x);
+				clean_buffer();
+				deletar(&lista_celulares[x]);
+				break;
 		}
 	}
 }
@@ -111,7 +111,7 @@ int inserir(Celular *lista_celulares, size_t size) {
 		clean_buffer();
 	}
 	else { return 1; } // Retornar 1 caso a lista esteja cheia
-	
+
 	puts("Celular cadastrado com sucesso!\n");
 	return 0; // Retornar 0 caso não haja nenhum erro
 }
@@ -122,25 +122,25 @@ void listar(Celular lista_celulares[], size_t size) {
 			continue;
 		else
 			printf("%d - Nome: %s\nAno: %d\nPreço: %d\n\n", 
-				i, lista_celulares[i].nome, lista_celulares[i].ano, lista_celulares[i].preco);
+					i, lista_celulares[i].nome, lista_celulares[i].ano, lista_celulares[i].preco);
 	}
 	puts("\n");
 }
 
-void	atualizar(Celular *celular) {
-		puts("\n\nDigite o novo nome do celular\n");
-		input_string(celular->nome, 30);
-		clean_buffer();
+void atualizar(Celular *celular) {
+	puts("\n\nDigite o novo nome do celular\n");
+	input_string(celular->nome, 30);
+	clean_buffer();
 
-		puts("Digite o novo ano do celular\n");
-		scanf("%d", &celular->ano);
-		clean_buffer();
+	puts("Digite o novo ano do celular\n");
+	scanf("%d", &celular->ano);
+	clean_buffer();
 
-		puts("Digite o novo preço do celular\n");
-		scanf("%d", &celular->preco);
-		clean_buffer();
+	puts("Digite o novo preço do celular\n");
+	scanf("%d", &celular->preco);
+	clean_buffer();
 
-		printf("Atualização concluída!\n\n");
+	printf("Atualização concluída!\n\n");
 }
 
 void deletar(Celular *celular) {
