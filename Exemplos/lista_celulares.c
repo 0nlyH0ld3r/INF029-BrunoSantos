@@ -166,6 +166,7 @@ void listar(Celular lista_celulares[], size_t size) {
 		else
 			printf("%d - NOME: %s\n\nAno: %d\nPreço: %d\n\n", i, lista_celulares[i].nome, lista_celulares[i].ano, lista_celulares[i].preco);
 	}
+
 	puts("\n");
 }
 
