@@ -173,7 +173,6 @@ void listar(Celular lista_celulares[], size_t size) {
 void atualizar(Celular *celular) {
 	int op;
 
-	clean_buffer();
 	puts("Deseja atualizar o nome? (s - sim) (n - não): ");
 
 	if ((op = input_char()) == 's' || op == 'S') {
