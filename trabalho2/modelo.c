@@ -23,19 +23,9 @@ typedef struct {
 	int total_size;
 } List;
 
-List vetor = {0};
 
 int create_node(int pos, int size)
 {
-	--pos;
-
-	if (pos > 9) return -1;
-	if (size > 10) return -2;
-	if (vetor.subs[pos].data) return -3;
-
-	vetor.subs[pos].data = malloc(sizeof(int) * size);
-
-	return 0;
 }
 
 int delete_node(int pos)

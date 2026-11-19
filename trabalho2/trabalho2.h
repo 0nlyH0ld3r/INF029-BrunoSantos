@@ -9,6 +9,19 @@ enum { TODAS_ESTRUTURAS_AUXILIARES_VAZIAS = -11, NOVO_TAMANHO_INVALIDO, NUMERO_I
        ESTRUTURA_AUXILIAR_VAZIA, TAMANHO_INVALIDO, SEM_ESPACO_DE_MEMORIA, POSICAO_INVALIDA,
        JA_TEM_ESTRUTURA_AUXILIAR, SEM_ESTRUTURA_AUXILIAR, SEM_ESPACO, SUCESSO };
 
+#define SENTINEL -50000000
+
+typedef struct {
+	int *data;
+	int current_size;
+	int max_size;
+} Node;
+
+typedef struct {
+	Node subs[10];
+	int total_size;
+} List;
+
 typedef struct reg {
     int conteudo;
     struct reg *prox;

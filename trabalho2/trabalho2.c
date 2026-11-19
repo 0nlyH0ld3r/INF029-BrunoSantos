@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define TAM 10
-
 #include "trabalho2.h"
 
-int vetorPrincipal[TAM];
+List vetor = {0};
 
 /*
    Objetivo: criar estrutura auxiliar na posição 'posicao'.
@@ -17,22 +15,40 @@ int vetorPrincipal[TAM];
    SEM_ESPACO_DE_MEMORIA - Sem espaço de memória
    TAMANHO_INVALIDO - o tamanho deve ser maior ou igual a 1
    */
-int criarEstruturaAuxiliar(int posicao, int tamanho)
+int criarEstruturaAuxiliar(int pos, int size)
 {
 
-	int retorno = 0;
-	// a posicao pode já existir estrutura auxiliar
-	retorno = JA_TEM_ESTRUTURA_AUXILIAR;
-	// se posição é um valor válido {entre 1 e 10}
-	retorno = POSICAO_INVALIDA;
-	// o tamanho ser muito grande
-	retorno = SEM_ESPACO_DE_MEMORIA;
-	// o tamanho nao pode ser menor que 1
-	retorno = TAMANHO_INVALIDO;
-	// deu tudo certo, crie
-	retorno = SUCESSO;
+	--pos;
 
-	return retorno;
+	// // a posicao pode já existir estrutura auxiliar
+	// retorno = JA_TEM_ESTRUTURA_AUXILIAR;
+	if (vetor.subs[pos].data)
+		return JA_TEM_ESTRUTURA_AUXILIAR;
+
+	// // se posição é um valor válido {entre 0 e 9}
+	// retorno = POSICAO_INVALIDA;
+	if (pos > 10 || pos < 0)
+		return POSICAO_INVALIDA;
+
+	// // o tamanho ser muito grande
+	// retorno = SEM_ESPACO_DE_MEMORIA;
+	if (size > 9)
+		return SEM_ESPACO_DE_MEMORIA;
+
+	// // o tamanho nao pode ser menor que 1
+	// retorno = TAMANHO_INVALIDO;
+	if (size < 1)
+		return TAMANHO_INVALIDO;
+
+	vetor.subs[pos].data = malloc(sizeof(int) * size);
+
+	if (!vetor.subs[pos].data)
+		return SEM_ESPACO_DE_MEMORIA;
+
+	// // deu tudo certo, crie
+	// retorno = SUCESSO;
+	return SUCESSO;
+
 }
 
 /*
@@ -44,37 +60,29 @@ int criarEstruturaAuxiliar(int posicao, int tamanho)
    POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
    CONSTANTES
    */
-int inserirNumeroEmEstrutura(int posicao, int valor)
+int inserirNumeroEmEstrutura(int pos, int val)
 {
-	int retorno = 0;
-	int existeEstruturaAuxiliar = 0;
-	int temEspaco = 0;
-	int posicao_invalida = 0;
+	Node *node = NULL;
 
-	if (posicao_invalida)
-		retorno = POSICAO_INVALIDA;
-	else
-	{
-		// testar se existe a estrutura auxiliar
-		if (existeEstruturaAuxiliar)
-		{
-			if (temEspaco)
-			{
-				//insere
-				retorno = SUCESSO;
-			}
-			else
-			{
-				retorno = SEM_ESPACO;
-			}
-		}
-		else
-		{
-			retorno = SEM_ESTRUTURA_AUXILIAR;
-		}
-	}
+	--pos;
 
-	return retorno;
+	if (pos > 9 || pos < 0)
+		return POSICAO_INVALIDA;
+	
+	// testar se existe a estrutura auxiliar
+	if (!vetor.subs[pos].data)
+		return SEM_ESTRUTURA_AUXILIAR;
+
+	node = &vetor.subs[pos];
+
+	if (node->current_size >= node->max_size)
+		return SEM_ESPACO;
+
+	node->data[node->current_size] = val;
+	++node->current_size;
+
+
+	return SUCESSO;
 }
 
 /*
@@ -88,10 +96,27 @@ int inserirNumeroEmEstrutura(int posicao, int valor)
    SEM_ESTRUTURA_AUXILIAR - Não tem estrutura auxiliar
    POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
    */
-int excluirNumeroDoFinaldaEstrutura(int posicao)
+int excluirNumeroDoFinaldaEstrutura(int pos)
 {
-	int retorno = SUCESSO;
-	return retorno;
+	Node *node = NULL;
+
+	--pos;
+
+	if (pos > 9 || pos < 0)
+		return POSICAO_INVALIDA;
+
+	if (!vetor.subs[pos].data)
+		return SEM_ESTRUTURA_AUXILIAR;
+
+	node = &vetor.subs[pos];
+
+	if (!node->current_size)
+   		return ESTRUTURA_AUXILIAR_VAZIA;
+
+	--node->current_size;
+	node->data[node->current_size] = SENTINEL;
+
+	return SUCESSO;
 }
 
 /*
@@ -107,25 +132,60 @@ int excluirNumeroDoFinaldaEstrutura(int posicao)
    POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 
 */
-int excluirNumeroEspecificoDeEstrutura(int posicao, int valor)
+int excluirNumeroEspecificoDeEstrutura(int pos, int val)
 {
-	int retorno = SUCESSO;
-	return retorno;
+	Node *node = NULL;
+
+	--pos;
+
+	if (pos > 9 || pos < 0)
+		return POSICAO_INVALIDA;
+
+	if (!vetor.subs[pos].data)
+		return SEM_ESTRUTURA_AUXILIAR;
+
+	node = &vetor.subs[pos];
+
+	if (!node->current_size)
+   		return ESTRUTURA_AUXILIAR_VAZIA;
+
+	int i = 0;
+	for (; i < node->current_size; ++i) {
+		if (node->data[i] == val) {
+			node->data[i] = SENTINEL;
+			break;
+		}
+	}
+
+	++i;
+	// TODO: Verificar depois
+	// TODO: Verificar depois se tá funcionando corretamente.
+	// TODO: Verificar depois
+	for (; i < node->current_size; ++i) {
+		node->data[i-1] = node->data[i];
+		node->data[i] = SENTINEL;
+	}
+
+	--node->current_size;
+
+	return SUCESSO;
+
 }
 
 // se posição é um valor válido {entre 1 e 10}
-int ehPosicaoValida(int posicao)
+int ehPosicaoValida(int pos)
 {
-	int retorno = 0;
-	if (posicao < 1 || posicao > 10)
-	{
-		retorno = POSICAO_INVALIDA;
-	}
-	else
-		retorno = SUCESSO;
+	if (pos < 0 || pos > 9)
+		return POSICAO_INVALIDA;
 
-	return retorno;
+	return SUCESSO;
 }
+
+// TODO: Tudo abaixo
+// TODO: Tudo abaixo
+// TODO: Tudo abaixo
+// TODO: Tudo abaixo
+// TODO: Tudo abaixo
 /*
    Objetivo: retorna os números da estrutura auxiliar da posição 'posicao (1..10)'.
    os números devem ser armazenados em vetorAux
