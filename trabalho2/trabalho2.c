@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include "trabalho2.h"
 
+// Olha em trabalho2.h para ver sobre a estrutura
 List vetor = {0};
+
+	// Verifica se a posição dada é válida e se a estrutura naquela posição existe ou
+	// não. Retorna sucesso caso a estrutura sejá válida nesses quesitos, retorna qual
+	// erro foi encontrado caso seja inválida.
+int verificar_estrutura(int pos);
 
    // Objetivo: criar estrutura auxiliar na posição 'posicao'.
    // com tamanho 'tamanho'
@@ -39,6 +45,7 @@ int criarEstruturaAuxiliar(int pos, int size)
 
 }
 
+
    // Objetivo: inserir número 'valor' em estrutura auxiliar da posição 'posicao'
    // Rertono (int)
    // SUCESSO - inserido com sucesso
@@ -48,16 +55,13 @@ int criarEstruturaAuxiliar(int pos, int size)
    // CONSTANTES
 int inserirNumeroEmEstrutura(int pos, int val)
 {
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-	
-	// testar se existe a estrutura auxiliar
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	node = &vetor.subs[pos];
 
@@ -82,15 +86,13 @@ int inserirNumeroEmEstrutura(int pos, int val)
    // POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 int excluirNumeroDoFinaldaEstrutura(int pos)
 {
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	node = &vetor.subs[pos];
 
@@ -98,7 +100,6 @@ int excluirNumeroDoFinaldaEstrutura(int pos)
    		return ESTRUTURA_AUXILIAR_VAZIA;
 
 	--node->current_size;
-	node->data[node->current_size] = SENTINEL;
 
 	return SUCESSO;
 }
@@ -115,43 +116,33 @@ int excluirNumeroDoFinaldaEstrutura(int pos)
    // POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 int excluirNumeroEspecificoDeEstrutura(int pos, int val)
 {
+	// Valida se é possível excluir a sub-estrutura, encontra a posição do valor, reordena o vetor para que o valor excluído seja posto ao
+	// final e decrementa o tamanho total do vetor (Exclusão lógica).
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	node = &vetor.subs[pos];
 
 	if (!node->current_size)
    		return ESTRUTURA_AUXILIAR_VAZIA;
 
-	// Estou usando vetores.
-	// Aqui eu crio a variável i pra descobrir a posição do elemento a ser removido
-	// e então itero até achar esse elemento no vetor.
 	int i = 0;
+
 	for (; i < node->current_size; ++i) {
-		if (node->data[i] == val) {
-			node->data[i] = SENTINEL;	// SENTINEL é um módulo enorme negativado para auxiliar
-			break;						// no processo de ordenação.
-		}
+		if (node->data[i] == val)
+			break;
 	}
 
-	// Incrementando para ficar um elemento acima do vetor.
 	++i;
 
-	// Fazendo um insertion sort pra mantar o elemento retirado pro início. Não sei
-	// se eu deveria fazer isso, mas estou fazendo. Verificar depois.
-	if (node->data[i-1] == SENTINEL) {
-		for (; i < node->current_size; ++i) {
-			node->data[i-1] = node->data[i];
-			node->data[i] = SENTINEL;
-		}
-	}
+	for (; i < node->current_size; ++i) {
+		node->data[i-1] = node->data[i]; 	// Jogando os elementos seguintes pra trás para sobrepor o excluído. Último elemento fica livre
+	}										// logicamente, não é necessário altera-lo.
 
 	--node->current_size;
 
@@ -159,8 +150,8 @@ int excluirNumeroEspecificoDeEstrutura(int pos, int val)
 
 }
 
-// se posição é um valor válido {entre 1 e 10}
-int ehPosicaoValida(int pos)
+// se posição é um valor válido (entre 1 e 10)
+int ehPosicaoValida(int pos) // Função inútil, mas ainda não sei se posso apagar
 {
 	if (pos < 0 || pos > 9)
 		return POSICAO_INVALIDA;
@@ -177,15 +168,13 @@ int ehPosicaoValida(int pos)
    // POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 int getDadosEstruturaAuxiliar(int pos, int buf[])
 {
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	node = &vetor.subs[pos];
 
@@ -205,15 +194,12 @@ int getDadosEstruturaAuxiliar(int pos, int buf[])
    // POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 int getDadosOrdenadosEstruturaAuxiliar(int pos, int buf[])
 {
+	int result;
+
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
-
-	getDadosEstruturaAuxiliar(pos, buf);
+	if ((result = getDadosEstruturaAuxiliar(pos, buf)) != SUCESSO)
+		return result;
 
 	for (int i = 1; i < vetor.subs[pos].current_size; ++i) {
 		int tmp = buf[i];
@@ -293,16 +279,13 @@ int getDadosOrdenadosDeTodasEstruturasAuxiliares(int buf[])
    // SEM_ESPACO_DE_MEMORIA - erro na alocação do novo valor
 int modificarTamanhoEstruturaAuxiliar(int pos, int new_size)
 {
-
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-	
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	if (new_size > 0 || new_size > 10)
 		return NOVO_TAMANHO_INVALIDO;
@@ -326,16 +309,13 @@ int modificarTamanhoEstruturaAuxiliar(int pos, int new_size)
    // Um número int > 0 correpondente a quantidade de elementos preenchidos da estrutura
 int getQuantidadeElementosEstruturaAuxiliar(int pos)
 {
-
+	int result;
 	Node *node = NULL;
 
 	--pos;
 
-	if (pos > 9 || pos < 0)
-		return POSICAO_INVALIDA;
-
-	if (!vetor.subs[pos].data)
-		return SEM_ESTRUTURA_AUXILIAR;
+	if ((result = verificar_estrutura(pos)) != SUCESSO)
+		return result;
 
 	node = &vetor.subs[pos];
 
@@ -380,4 +360,15 @@ void inicializar()
    // para poder liberar todos os espaços de memória das estruturas auxiliares.
 void finalizar()
 {
+}
+
+int verificar_estrutura(int pos)
+{
+	if (pos > 9 || pos < 0)
+		return POSICAO_INVALIDA;
+	
+	if (!vetor.subs[pos].data)
+		return SEM_ESTRUTURA_AUXILIAR;
+
+	return SUCESSO;
 }
