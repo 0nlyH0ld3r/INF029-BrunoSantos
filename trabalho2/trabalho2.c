@@ -24,19 +24,17 @@ int criarEstruturaAuxiliar(int pos, int size)
 
 	--pos;
 
-	if (vetor.subs[pos].data)
-		return JA_TEM_ESTRUTURA_AUXILIAR;
-
-	if (pos > 10 || pos < 0)
+	if (pos > 9 || pos < 0)
 		return POSICAO_INVALIDA;
 
-	if (size > 9)
-		return SEM_ESPACO_DE_MEMORIA;
+	if (vetor.subs[pos].data)
+		return JA_TEM_ESTRUTURA_AUXILIAR;
 
 	if (size < 1)
 		return TAMANHO_INVALIDO;
 
 	vetor.subs[pos].data = malloc(sizeof(int) * size);
+	vetor.subs[pos].max_size = size;
 
 	if (!vetor.subs[pos].data)
 		return SEM_ESPACO_DE_MEMORIA;
@@ -69,8 +67,9 @@ int inserirNumeroEmEstrutura(int pos, int val)
 		return SEM_ESPACO;
 
 	node->data[node->current_size] = val;
-	++node->current_size;
 
+	++node->current_size;
+	++vetor.total_size;
 
 	return SUCESSO;
 }
@@ -100,6 +99,7 @@ int excluirNumeroDoFinaldaEstrutura(int pos)
    		return ESTRUTURA_AUXILIAR_VAZIA;
 
 	--node->current_size;
+	--vetor.total_size;
 
 	return SUCESSO;
 }
@@ -138,6 +138,9 @@ int excluirNumeroEspecificoDeEstrutura(int pos, int val)
 			break;
 	}
 
+	if (i == node->current_size)
+		return NUMERO_INEXISTENTE;
+
 	++i;
 
 	for (; i < node->current_size; ++i) {
@@ -145,6 +148,7 @@ int excluirNumeroEspecificoDeEstrutura(int pos, int val)
 	}										// logicamente, não é necessário altera-lo.
 
 	--node->current_size;
+	--vetor.total_size;
 
 	return SUCESSO;
 
@@ -176,6 +180,7 @@ int getDadosEstruturaAuxiliar(int pos, int buf[])
 	if ((result = verificar_estrutura(pos)) != SUCESSO)
 		return result;
 
+
 	node = &vetor.subs[pos];
 
 	for (int i = 0; i < node->current_size; ++i) {
@@ -198,7 +203,7 @@ int getDadosOrdenadosEstruturaAuxiliar(int pos, int buf[])
 
 	--pos;
 
-	if ((result = getDadosEstruturaAuxiliar(pos, buf)) != SUCESSO)
+	if ((result = getDadosEstruturaAuxiliar(pos+1, buf)) != SUCESSO)
 		return result;
 
 	for (int i = 1; i < vetor.subs[pos].current_size; ++i) {
@@ -277,25 +282,36 @@ int getDadosOrdenadosDeTodasEstruturasAuxiliares(int buf[])
    // POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
    // NOVO_TAMANHO_INVALIDO - novo tamanho não pode ser negativo
    // SEM_ESPACO_DE_MEMORIA - erro na alocação do novo valor
-int modificarTamanhoEstruturaAuxiliar(int pos, int new_size)
+int modificarTamanhoEstruturaAuxiliar(int pos, int size)
 {
 	int result;
 	Node *node = NULL;
 
 	--pos;
 
+
 	if ((result = verificar_estrutura(pos)) != SUCESSO)
 		return result;
 
-	if (new_size > 0 || new_size > 10)
-		return NOVO_TAMANHO_INVALIDO;
 
 	node = &vetor.subs[pos];
 
-	node = realloc(node, new_size * sizeof(int));
+	if (size + node->max_size < 1)
+		return NOVO_TAMANHO_INVALIDO;
 
-	if (!node)
+	if (size + node->max_size < node->current_size) {
+		vetor.total_size -= (node->current_size - (size + node->max_size));
+		node->current_size = size + node->max_size;
+	}
+
+	node->max_size += size;
+
+	int *ptr = realloc(node->data, node->max_size * sizeof(int));
+
+	if (!ptr)
 		return SEM_ESPACO_DE_MEMORIA;
+
+	node->data = ptr;
 
 	return SUCESSO;
 }
@@ -325,6 +341,51 @@ int getQuantidadeElementosEstruturaAuxiliar(int pos)
 	return node->current_size;
 }
 
+
+
+
+
+
+
+
+int inserir(No **lista, int valor)
+{
+	No* ptr = NULL;
+
+	if (!lista)
+		return 0;
+
+	if (!*lista) {
+		*lista = malloc(sizeof(No));
+		ptr = *lista;
+
+		if (!ptr)
+			return 0;
+
+		ptr->conteudo = 0;
+		ptr->prox = NULL;
+	}
+
+	ptr = *lista;
+
+	while (ptr->prox)
+		ptr = ptr->prox;
+
+	ptr->prox = malloc(sizeof(No));
+
+	if (!ptr->prox)
+		return 0;
+
+	ptr->prox->prox = NULL;
+	ptr->prox->conteudo = valor;
+
+	return 1;
+}
+
+
+
+
+
    // Objetivo: montar a lista encadeada com cabeçote com todos os números presentes em todas as estruturas.
    //
    // Retorno (No*)
@@ -332,23 +393,51 @@ int getQuantidadeElementosEstruturaAuxiliar(int pos)
    // No*, ponteiro para o início da lista com cabeçote
 No *montarListaEncadeadaComCabecote()
 {
+	if (!vetor.total_size)
+		return NULL;
 
-	return NULL;
+	No *lista = NULL;
+	int aux[100] = {0};
+
+	getDadosDeTodasEstruturasAuxiliares(aux);
+	for (int i = 0; i < vetor.total_size; ++i)
+		inserir(&lista, aux[i]);
+	return lista;
 }
 
    // Objetivo: retorna os números da lista enceada com cabeçote armazenando em vetorAux.
    // Retorno void
 void getDadosListaEncadeadaComCabecote(No *inicio, int vetorAux[])
 {
+	if (!inicio)
+		return;
+
+	inicio = inicio->prox;
+
+	while (inicio) {
+		*vetorAux = inicio->conteudo;
+		inicio = inicio->prox;
+		++vetorAux;
+	}
 }
 
    // Objetivo: Destruir a lista encadeada com cabeçote a partir de início.
    // O ponteiro inicio deve ficar com NULL.
    //
-   // Retorno 
+   // Retorno
    // void.
 void destruirListaEncadeadaComCabecote(No **inicio)
 {
+	if (!inicio || !*inicio)
+		return;
+
+	No *ptr = *inicio;
+
+	if (ptr->prox)
+		destruirListaEncadeadaComCabecote(&ptr->prox);
+
+	*inicio = NULL;
+	free(ptr);
 }
 
    // Objetivo: inicializa o programa. deve ser chamado ao inicio do programa 
